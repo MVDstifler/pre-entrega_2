@@ -7,7 +7,9 @@ document.getElementById('prestamoForm').addEventListener('submit', function(even
     const interesAnual = parseFloat(document.getElementById('interes').value);
     const plazoDeMeses = parseInt(document.getElementById('plazo').value);
 
-    if (!validarValores(creditoSolicitado, interesAnual, plazoDeMeses)) {
+    // Validar valores utilizando operadores AND y OR
+    const esValido = validarValores(creditoSolicitado, interesAnual, plazoDeMeses);
+    if (!esValido) {
         alert("Por favor, ingrese valores válidos y positivos.");
         return;
     }
@@ -17,6 +19,7 @@ document.getElementById('prestamoForm').addEventListener('submit', function(even
     const montoTotal = pagoMensual * plazoDeMeses;
     const totalIntereses = montoTotal - creditoSolicitado;
 
+    // Crear un nuevo préstamo utilizando el operador spread para replicar el objeto
     const nuevoPrestamo = {
         monto: creditoSolicitado,
         interes: interesAnual,
@@ -26,7 +29,8 @@ document.getElementById('prestamoForm').addEventListener('submit', function(even
         montoTotal: montoTotal
     };
 
-    prestamos.push(nuevoPrestamo);
+    // Usar el operador spread para crear una copia de la lista de préstamos y agregar el nuevo préstamo
+    prestamos = [...prestamos, {...nuevoPrestamo}];
     localStorage.setItem('prestamos', JSON.stringify(prestamos));
 
     mostrarResultados(nuevoPrestamo);
@@ -53,30 +57,42 @@ function mostrarResultados(prestamo) {
 function actualizarPrestamosAltosIntereses() {
     const prestamosAltosInteresesDiv = document.getElementById('prestamosAltosIntereses');
     const prestamosAltosIntereses = prestamos.filter(prestamo => prestamo.interes > 5);
-    prestamosAltosInteresesDiv.innerHTML = prestamosAltosIntereses.map(prestamo => `
-        <p>
-            Monto del Préstamo: $${prestamo.monto.toFixed(2)}<br>
-            Tasa de Interés Anual: ${prestamo.interes.toFixed(2)}%<br>
-            Plazo del Préstamo: ${prestamo.plazo} meses<br>
-            Pago Mensual: $${prestamo.pagoMensual.toFixed(2)}<br>
-            Total de Intereses: $${prestamo.totalIntereses.toFixed(2)}<br>
-            Monto Total a Pagar: $${prestamo.montoTotal.toFixed(2)}
-        </p>
-    `).join('');
+    prestamosAltosInteresesDiv.innerHTML = prestamosAltosIntereses.length > 0
+        ? prestamosAltosIntereses.map(prestamo => `
+            <p>
+                Monto del Préstamo: $${prestamo.monto.toFixed(2)}<br>
+                Tasa de Interés Anual: ${prestamo.interes.toFixed(2)}%<br>
+                Plazo del Préstamo: ${prestamo.plazo} meses<br>
+                Pago Mensual: $${prestamo.pagoMensual.toFixed(2)}<br>
+                Total de Intereses: $${prestamo.totalIntereses.toFixed(2)}<br>
+                Monto Total a Pagar: $${prestamo.montoTotal.toFixed(2)}
+            </p>
+        `).join('')
+        : '<p>No hay préstamos con tasa de interés mayor al 5%.</p>';
 }
 
 function actualizarMontosPrestamos() {
     const montosPrestamosDiv = document.getElementById('montosPrestamos');
     const montosPrestamos = prestamos.map(prestamo => prestamo.monto);
-    montosPrestamosDiv.innerHTML = `<p>${montosPrestamos.join(', ')}</p>`;
+    montosPrestamosDiv.innerHTML = montosPrestamos.length > 0
+        ? `<p>${montosPrestamos.join(', ')}</p>`
+        : '<p>No hay préstamos registrados.</p>';
 }
 
 function validarValores(monto, interes, meses) {
+    // Usar operador AND (&&) para validar que todos los valores sean mayores que 0
     return monto > 0 && interes > 0 && meses > 0;
 }
 
 // Actualizar los elementos al cargar la página
 document.addEventListener('DOMContentLoaded', function() {
-    actualizarPrestamosAltosIntereses();
-    actualizarMontosPrestamos();
+    // Usar operador OR (||) para mostrar mensajes predeterminados si no hay préstamos
+    actualizarPrestamosAltosIntereses() || mostrarMensaje('No hay préstamos con tasa de interés mayor al 5%.');
+    actualizarMontosPrestamos() || mostrarMensaje('No hay préstamos registrados.');
 });
+
+function mostrarMensaje(mensaje) {
+    // Función para mostrar mensajes cuando no hay datos
+    const div = document.getElementById('resultados');
+    div.innerHTML = `<p>${mensaje}</p>`;
+}

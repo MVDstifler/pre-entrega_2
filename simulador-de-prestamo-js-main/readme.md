@@ -19,3 +19,11 @@ map: Crea un nuevo array que contiene solo los montos de los préstamos y los mu
 
 JSON: Utiliza JSON.parse y JSON.stringify
 Storage: Usa "localStorage"
+
+
+Operador AND (&&):
+
+En la función validarValores el operador AND para asegurar que todos los valores (monto, interes, y meses) sean mayores que 0.
+
+Operador OR (||):
+DOMContentLoaded event listener, se utiliza el operador OR para invocar la función mostrarMensaje si las funciones actualizarPrestamosAltosIntereses y actualizarMontosPrestamos no actualizan nada (por ejemplo, cuando no hay datos). 
