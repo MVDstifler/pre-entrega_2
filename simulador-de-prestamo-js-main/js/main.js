@@ -1,74 +1,82 @@
-let prestamos = JSON.parse(localStorage.getItem('prestamos')) || []; 
+let prestamos = JSON.parse(localStorage.getItem('prestamos')) || [];
 
-function calcularCredito() {
-    let creditoSolicitado, interesAnual, plazoDeMeses;
+document.getElementById('prestamoForm').addEventListener('submit', function(event) {
+    event.preventDefault();
 
-    do {
-        do {
-            creditoSolicitado = parseFloat(prompt("Ingrese el monto del préstamo:"));
-            interesAnual = parseFloat(prompt("Ingrese la tasa de interés anual (%):"));
-            plazoDeMeses = parseInt(prompt("Ingrese el plazo del préstamo (meses):"));
+    const creditoSolicitado = parseFloat(document.getElementById('monto').value);
+    const interesAnual = parseFloat(document.getElementById('interes').value);
+    const plazoDeMeses = parseInt(document.getElementById('plazo').value);
 
-            if (!validarValores(creditoSolicitado, interesAnual, plazoDeMeses)) {
-                alert("Por favor, ingrese valores válidos y positivos.");
-            }
-        } while (!validarValores(creditoSolicitado, interesAnual, plazoDeMeses));
+    if (!validarValores(creditoSolicitado, interesAnual, plazoDeMeses)) {
+        alert("Por favor, ingrese valores válidos y positivos.");
+        return;
+    }
 
-        const interesMensual = interesAnual / 12 / 100;
-        const pagoMensual = (creditoSolicitado * interesMensual) / (1 - Math.pow(1 + interesMensual, -plazoDeMeses));
-        const montoTotal = pagoMensual * plazoDeMeses;
-        const totalIntereses = montoTotal - creditoSolicitado;
+    const interesMensual = interesAnual / 12 / 100;
+    const pagoMensual = (creditoSolicitado * interesMensual) / (1 - Math.pow(1 + interesMensual, -plazoDeMeses));
+    const montoTotal = pagoMensual * plazoDeMeses;
+    const totalIntereses = montoTotal - creditoSolicitado;
 
-        const nuevoPrestamo = {
-            monto: creditoSolicitado,
-            interes: interesAnual,
-            plazo: plazoDeMeses,
-            pagoMensual: pagoMensual,
-            totalIntereses: totalIntereses,
-            montoTotal: montoTotal
-        };
+    const nuevoPrestamo = {
+        monto: creditoSolicitado,
+        interes: interesAnual,
+        plazo: plazoDeMeses,
+        pagoMensual: pagoMensual,
+        totalIntereses: totalIntereses,
+        montoTotal: montoTotal
+    };
 
-        prestamos.push(nuevoPrestamo);
-        localStorage.setItem('prestamos', JSON.stringify(prestamos)); 
+    prestamos.push(nuevoPrestamo);
+    localStorage.setItem('prestamos', JSON.stringify(prestamos));
 
-        mostrarResultados(nuevoPrestamo);
+    mostrarResultados(nuevoPrestamo);
+    actualizarPrestamosAltosIntereses();
+    actualizarMontosPrestamos();
 
-        
-        const continuar = confirm("¿Desea realizar otro préstamo?");
-        if (!continuar) {
-            break; 
-        }
-
-    } while (true); 
-
-    alert("Gracias por utilizar nuestro servicio de cálculo de préstamos. ¡Hasta luego!");
-
-    
-    const prestamosAltosIntereses = prestamos.filter(prestamo => prestamo.interes > 5);
-    console.log("Préstamos con tasa de interés mayor al 5%:");
-    prestamosAltosIntereses.forEach(mostrarResultados);
-
-    
-    const montosPrestamos = prestamos.map(prestamo => prestamo.monto);
-    console.log("Montos de los préstamos:", montosPrestamos);
-}
+    document.getElementById('prestamoForm').reset();
+});
 
 function mostrarResultados(prestamo) {
+    const resultadosDiv = document.getElementById('resultados');
     const mensaje = `
-    Monto del Préstamo: $${prestamo.monto.toFixed(2)}
-    Tasa de Interés Anual: ${prestamo.interes.toFixed(2)}%
-    Plazo del Préstamo: ${prestamo.plazo} meses
-    Pago Mensual: $${prestamo.pagoMensual.toFixed(2)}
-    Total de Intereses: $${prestamo.totalIntereses.toFixed(2)}
-    Monto Total a Pagar: $${prestamo.montoTotal.toFixed(2)}
-    `;
+    <p>
+        Monto del Préstamo: $${prestamo.monto.toFixed(2)}<br>
+        Tasa de Interés Anual: ${prestamo.interes.toFixed(2)}%<br>
+        Plazo del Préstamo: ${prestamo.plazo} meses<br>
+        Pago Mensual: $${prestamo.pagoMensual.toFixed(2)}<br>
+        Total de Intereses: $${prestamo.totalIntereses.toFixed(2)}<br>
+        Monto Total a Pagar: $${prestamo.montoTotal.toFixed(2)}
+    </p>`;
+    resultadosDiv.innerHTML = mensaje;
+}
 
-    console.log(mensaje);
-    alert(mensaje);
+function actualizarPrestamosAltosIntereses() {
+    const prestamosAltosInteresesDiv = document.getElementById('prestamosAltosIntereses');
+    const prestamosAltosIntereses = prestamos.filter(prestamo => prestamo.interes > 5);
+    prestamosAltosInteresesDiv.innerHTML = prestamosAltosIntereses.map(prestamo => `
+        <p>
+            Monto del Préstamo: $${prestamo.monto.toFixed(2)}<br>
+            Tasa de Interés Anual: ${prestamo.interes.toFixed(2)}%<br>
+            Plazo del Préstamo: ${prestamo.plazo} meses<br>
+            Pago Mensual: $${prestamo.pagoMensual.toFixed(2)}<br>
+            Total de Intereses: $${prestamo.totalIntereses.toFixed(2)}<br>
+            Monto Total a Pagar: $${prestamo.montoTotal.toFixed(2)}
+        </p>
+    `).join('');
+}
+
+function actualizarMontosPrestamos() {
+    const montosPrestamosDiv = document.getElementById('montosPrestamos');
+    const montosPrestamos = prestamos.map(prestamo => prestamo.monto);
+    montosPrestamosDiv.innerHTML = `<p>${montosPrestamos.join(', ')}</p>`;
 }
 
 function validarValores(monto, interes, meses) {
     return monto > 0 && interes > 0 && meses > 0;
 }
 
-calcularCredito();
+// Actualizar los elementos al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+    actualizarPrestamosAltosIntereses();
+    actualizarMontosPrestamos();
+});
