@@ -15,3 +15,7 @@ map: Crea un nuevo array que contiene solo los montos de los préstamos y los mu
 41- // Repetir el proceso mientras el usuario quiera realizar más préstamos
 45- // Filtrar préstamos con una tasa de interés mayor al 5%
 50-  // Mapear para obtener solo los montos de los préstamos
+
+
+JSON: Utiliza JSON.parse y JSON.stringify
+Storage: Usa "localStorage"

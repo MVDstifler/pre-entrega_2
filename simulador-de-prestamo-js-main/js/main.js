@@ -1,4 +1,4 @@
-let prestamos = JSON.parse(localStorage.getItem('prestamos')) || []; // Cargar préstamos almacenados en localStorage o inicializar array vacío
+let prestamos = JSON.parse(localStorage.getItem('prestamos')) || []; 
 
 function calcularCredito() {
     let creditoSolicitado, interesAnual, plazoDeMeses;
@@ -29,26 +29,26 @@ function calcularCredito() {
         };
 
         prestamos.push(nuevoPrestamo);
-        localStorage.setItem('prestamos', JSON.stringify(prestamos)); // Guardar el nuevo préstamo en localStorage
+        localStorage.setItem('prestamos', JSON.stringify(prestamos)); 
 
         mostrarResultados(nuevoPrestamo);
 
-        // Preguntar al usuario si quiere realizar otro préstamo
+        
         const continuar = confirm("¿Desea realizar otro préstamo?");
         if (!continuar) {
-            break; // Salir del bucle si no desea continuar
+            break; 
         }
 
-    } while (true); // Repetir el proceso mientras el usuario quiera realizar más préstamos
+    } while (true); 
 
     alert("Gracias por utilizar nuestro servicio de cálculo de préstamos. ¡Hasta luego!");
 
-    // Filtrar préstamos con una tasa de interés mayor al 5%
+    
     const prestamosAltosIntereses = prestamos.filter(prestamo => prestamo.interes > 5);
     console.log("Préstamos con tasa de interés mayor al 5%:");
     prestamosAltosIntereses.forEach(mostrarResultados);
 
-    // Mapear para obtener solo los montos de los préstamos
+    
     const montosPrestamos = prestamos.map(prestamo => prestamo.monto);
     console.log("Montos de los préstamos:", montosPrestamos);
 }
